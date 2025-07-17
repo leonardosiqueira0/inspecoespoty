@@ -1,0 +1,99 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:inspecoespoty/data/models/inspection_type_model.dart';
+import 'package:inspecoespoty/data/models/person_model.dart';
+import 'package:inspecoespoty/ui/.core/widgets/custom_card.dart';
+import 'package:inspecoespoty/ui/.core/widgets/custom_loading.dart';
+import 'package:inspecoespoty/ui/inspection/controller/inspection_controller.dart';
+import 'package:inspecoespoty/ui/inspection/widgets/inspection_register.dart';
+import 'package:inspecoespoty/ui/person/controller/person_controller.dart';
+import 'package:inspecoespoty/ui/person/widgets/person_register.dart';
+import 'package:video_player/video_player.dart';
+
+class InspectionScreen extends StatefulWidget {
+  const InspectionScreen({super.key});
+
+  @override
+  State<InspectionScreen> createState() => _InspectionScreenState();
+}
+
+class _InspectionScreenState extends State<InspectionScreen> {
+  @override
+  Widget build(BuildContext context) {
+    Get.put(InspectionController());
+    final controller = Get.find<InspectionController>();
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tipos de Inspeção')),
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+
+        child: Obx(
+          () => Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: SearchBar(
+                  hintText: 'Pesquisar',
+                  controller: controller.searchController,
+                  onChanged: (value) {
+                    controller.filterInspections(value);
+                  },
+                  leading: const Icon(Icons.search),
+                ),
+              ),
+
+              if (controller.inspectionTypesFiltered.isEmpty)
+                Expanded(
+                  child: Center(child: Text('Nenhum registro encontrado')),
+                ),
+
+              if (controller.inspectionTypesFiltered.isNotEmpty)
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      controller.fetchInspectionTypes();
+                    },
+                    child: ListView.builder(
+                      itemCount: controller.inspectionTypesFiltered.length,
+                      itemBuilder: (context, index) {
+                        final inspectionType = controller.inspectionTypesFiltered[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: CustomCard(
+                            child: ListTile(
+                              title: Text(inspectionType.name),
+                              leading: CircleAvatar(child: Text(inspectionType.name[0].toUpperCase()),),
+                            ),
+                            onTap: () async {
+                              Get.to(() => CustomLoading());
+                              InspectionTypeModel? inspectionTypeModel = await controller.getInspectionType(id: inspectionType.id!);
+                              if (inspectionTypeModel != null) {
+                                await Future.delayed(Duration(milliseconds: 600));
+                                Get.back();
+                                Get.to(() => InspectionRegister(inspectionTypeModel: inspectionType));
+                              } else {
+                                Get.back();
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await Get.to(() => InspectionRegister());
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
