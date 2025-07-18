@@ -58,21 +58,53 @@ class _InspectionScreenState extends State<InspectionScreen> {
                     child: ListView.builder(
                       itemCount: controller.inspectionTypesFiltered.length,
                       itemBuilder: (context, index) {
-                        final inspectionType = controller.inspectionTypesFiltered[index];
+                        final inspectionType =
+                            controller.inspectionTypesFiltered[index];
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
                           child: CustomCard(
                             child: ListTile(
+                              contentPadding: EdgeInsets.zero,
                               title: Text(inspectionType.name),
-                              leading: CircleAvatar(child: Text(inspectionType.name[0].toUpperCase()),),
+                              subtitle: Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Tipo de Inspeção',
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.end,
+                                    children: [
+                                      Icon(Icons.paste_rounded, size: 16),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        '${inspectionType.quantity} Subtipos cadastrados',
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+
                             ),
                             onTap: () async {
                               Get.to(() => CustomLoading());
-                              InspectionTypeModel? inspectionTypeModel = await controller.getInspectionType(id: inspectionType.id!);
+                              InspectionTypeModel? inspectionTypeModel =
+                                  await controller.getInspectionType(
+                                    id: inspectionType.id!,
+                                  );
                               if (inspectionTypeModel != null) {
-                                await Future.delayed(Duration(milliseconds: 600));
+                                await Future.delayed(
+                                  Duration(milliseconds: 600),
+                                );
                                 Get.back();
-                                Get.to(() => InspectionRegister(inspectionTypeModel: inspectionType));
+                                Get.to(
+                                  () => InspectionRegister(
+                                    inspectionTypeModel: inspectionType,
+                                  ),
+                                );
                               } else {
                                 Get.back();
                               }
@@ -96,4 +128,3 @@ class _InspectionScreenState extends State<InspectionScreen> {
     );
   }
 }
-

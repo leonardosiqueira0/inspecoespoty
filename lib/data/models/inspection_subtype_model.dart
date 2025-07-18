@@ -1,10 +1,13 @@
-class InspectionSubtypeModel {
-  String id;
-  String name;
-  int quantity = 0;
-  String inspectionTypeId;
+import 'package:inspecoespoty/data/models/inspection_item_model.dart';
 
-  InspectionSubtypeModel({required this.id, required this.name, this.quantity = 0, required this.inspectionTypeId});
+class InspectionSubtypeModel {
+  String? id;
+  String name;
+  int? quantity = 0;
+  String inspectionTypeId;
+  List<InspectionItemModel>? inspectionItens;
+
+  InspectionSubtypeModel({this.id, required this.name, this.quantity = 0, required this.inspectionTypeId});
 
   factory InspectionSubtypeModel.fromJson(Map<String, dynamic> json) {
     return InspectionSubtypeModel(
@@ -18,6 +21,13 @@ class InspectionSubtypeModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
+    data['name'] = name;
+    data['inspectionTypeId'] = inspectionTypeId;
+    return data;
+  }
+
+  Map<String, dynamic> toJsonCreate() {
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['name'] = name;
     data['inspectionTypeId'] = inspectionTypeId;
     return data;

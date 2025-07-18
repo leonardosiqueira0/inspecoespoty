@@ -20,17 +20,38 @@ class CustomCard extends StatefulWidget {
 class _CustomCardState extends State<CustomCard> {
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: widget.onTap ?? () {},
-      child: Material(
-        elevation: 2,
-        borderRadius: BorderRadius.circular(4),
-        color: widget.color ?? primaryColor,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 6.0),
-          child: Container(
-            decoration: BoxDecoration(color: Colors.white),
-            child: widget.child,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: InkWell(
+        onTap: widget.onTap ?? () {},
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.grey.shade300,
+            ),
+            borderRadius: BorderRadius.circular(4.0),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 8),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: widget.color ?? Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(
+                    2.0,
+                  ),
+                ),
+              ),
+              widget.child
+
+            ],
           ),
         ),
       ),

@@ -60,6 +60,7 @@ class _PersonScreenState extends State<PersonScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
                           child: CustomCard(
                             child: ListTile(
+                              contentPadding: EdgeInsets.zero,
                               title: Text(person.name),
                               subtitle: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -71,7 +72,6 @@ class _PersonScreenState extends State<PersonScreen> {
                                   ),
                                 ],
                               ),
-                              leading: CircleAvatar(child: Icon(Icons.person)),
                             ),
                             onTap: () async {
                               Get.to(() => CustomLoading()); // Abre o loading sem await

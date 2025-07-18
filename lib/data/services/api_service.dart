@@ -21,6 +21,15 @@ class ApiService {
               'Bearer ${await Prefs.getString('token')}';
           return handler.next(options);
         },
+        onError: (error, handler) {
+          if (error.type == DioExceptionType.connectionTimeout ||
+              error.type == DioExceptionType.sendTimeout ||
+              error.type == DioExceptionType.receiveTimeout ||
+              error.type == DioExceptionType.connectionError) {
+            Get.offAll(NoInternetScreen());
+          }
+          return handler.next(error);
+        },
       ),
     );
 
@@ -30,7 +39,6 @@ class ApiService {
 Future<bool> checkTokenApi() async {
   bool? verificacao = await LoginService().checkToken();
   if (!verificacao!) {
-    print('Veinho, precisei atualizar o token');
     String? refreshToken = await Prefs.getString('refreshToken');
     if (refreshToken != null && refreshToken.isNotEmpty) {
       try {

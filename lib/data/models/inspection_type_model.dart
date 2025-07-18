@@ -1,14 +1,16 @@
 class InspectionTypeModel {
   String? id;
   String name;
+  int? quantity = 0;
   int departmentId;
 
-  InspectionTypeModel({this.id, required this.name, required this.departmentId});
+  InspectionTypeModel({this.id, required this.name, this.quantity = 0, required this.departmentId});
 
   factory InspectionTypeModel.fromJson(Map<String, dynamic> json) {
     return InspectionTypeModel(
       id: json['id'] as String?,
       name: json['name'] as String,
+      quantity: json['quantity'] as int?,
       departmentId: json['departmentID'],
     );
   }

@@ -68,14 +68,21 @@ class InspectionController extends GetxController {
     return null;
   }
 
-  Future<void> createInspectionType({required InspectionTypeModel inspectionType, required List<InspectionSubtypeModel> inspectionSubtypes}) async {
+  Future<void> createInspectionType({required InspectionTypeModel inspectionType, required List<InspectionSubtypeModel> inspectionSubtypesCreated, required List<InspectionSubtypeModel> inspectionSubtypesUpdated}) async {
     Get.to(() => CustomLoading());
     await _delay(milliseconds: 400);
     try {
       final result = await InspectionTypeService().createInspectionType(inspectionType: inspectionType);
       print(result.id);
-      for (var subtype in inspectionSubtypes) {
-        print(subtype.toJson());
+      for (var subtypeCreated in inspectionSubtypesCreated) {
+        InspectionSubtypeModel newModel = subtypeCreated;
+        newModel.inspectionTypeId = result.id!;
+        await InspectionSubtypeService().createInspectionSubtype(inspectionSubtype: newModel);
+      }
+      for (var subtypeUpdated in inspectionSubtypesUpdated) {
+        InspectionSubtypeModel newModel = subtypeUpdated;
+        newModel.inspectionTypeId = result.id!;
+        await InspectionSubtypeService().updateInspectionSubtype(inspectionSubtype: newModel);
       }
       Get.back();
       Get.back();
@@ -89,15 +96,19 @@ class InspectionController extends GetxController {
     }
   }
 
-  Future<void> updateInspectionType({required InspectionTypeModel inspectionType, required List<InspectionSubtypeModel> inspectionSubtypes}) async {
+  Future<void> updateInspectionType({required InspectionTypeModel inspectionType,required List<InspectionSubtypeModel> inspectionSubtypesCreated, required List<InspectionSubtypeModel> inspectionSubtypesUpdated}) async {
     Get.to(() => CustomLoading());
     await _delay(milliseconds: 400);
 
     try {
       final result = await InspectionTypeService().updateInspectionType(inspectionType: inspectionType);
-      print(result.id);
-      for (var subtype in inspectionSubtypes) {
-        print(subtype.toJson());
+      for (var subtypeCreated in inspectionSubtypesCreated) {
+        InspectionSubtypeModel newModel = subtypeCreated;
+        newModel.inspectionTypeId = result.id!;
+        await InspectionSubtypeService().createInspectionSubtype(inspectionSubtype: newModel);
+      }
+      for (var subtypeUpdated in inspectionSubtypesUpdated) {
+        await InspectionSubtypeService().updateInspectionSubtype(inspectionSubtype: subtypeUpdated);
       }
       Get.back();
       Get.back();
