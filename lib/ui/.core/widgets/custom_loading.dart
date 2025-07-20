@@ -15,6 +15,7 @@ class CustomLoading extends StatefulWidget {
 }
 
 class _CustomLoadingState extends State<CustomLoading> {
+
   @override
   Widget build(BuildContext context) {
     return Container(

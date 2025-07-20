@@ -3,8 +3,9 @@ class InspectionItemModel {
   String name;
   String inspectionSubtypeID;
   bool isEdited;
+  bool isSelected;
 
-  InspectionItemModel({this.id, required this.name, required this.inspectionSubtypeID, this.isEdited = false});
+  InspectionItemModel({this.id, required this.name, required this.inspectionSubtypeID, this.isEdited = false, this.isSelected = false});
 
   factory InspectionItemModel.fromJson(Map<String, dynamic> json) {
     return InspectionItemModel(
