@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:inspecoespoty/data/models/inspection_item_model.dart';
 import 'package:inspecoespoty/data/models/inspection_subtype_model.dart';
 import 'package:inspecoespoty/data/models/inspection_type_model.dart';
 import 'package:inspecoespoty/data/models/person_model.dart';
-import 'package:inspecoespoty/data/services/inspection_subtype_service.dart';
 import 'package:inspecoespoty/data/services/inspection_type_service.dart';
 import 'package:inspecoespoty/data/services/person_service.dart';
 import 'package:inspecoespoty/ui/.core/widgets/custom_alert.dart';
@@ -14,6 +14,7 @@ class InspectionController extends GetxController {
   RxList<InspectionTypeModel> inspectionTypes = <InspectionTypeModel>[].obs;
   RxList<InspectionTypeModel> inspectionTypesFiltered = <InspectionTypeModel>[].obs;
   TextEditingController searchController = TextEditingController();
+  RxBool isLoading = false.obs;
   @override
   void onInit() {
     fetchInspectionTypes();
@@ -22,6 +23,7 @@ class InspectionController extends GetxController {
   }
 
   void fetchInspectionTypes() async {
+    isLoading.value = true;
     try {
       List<InspectionTypeModel> fetchedInspectionTypes = await InspectionTypeService().fetchInspectionTypesService();
       inspectionTypes.assignAll(fetchedInspectionTypes);
@@ -36,6 +38,9 @@ class InspectionController extends GetxController {
         colorText: Colors.white,
         backgroundColor: Colors.red.shade400,
       );
+    } finally {
+      isLoading.value = false;
+
     }
   }
 
@@ -59,32 +64,14 @@ class InspectionController extends GetxController {
     }
   }
 
-  Future<List<InspectionSubtypeModel>?> getInspectionSubTypes({required String id}) async {
-    try {
-      return await InspectionSubtypeService().getInspectionSubtypes(id: id);
-    } catch (e) {
-      Get.snackbar('Erro', '$e');
-    }
-    return null;
-  }
 
   Future<void> createInspectionType({required InspectionTypeModel inspectionType, required List<InspectionSubtypeModel> inspectionSubtypesCreated, required List<InspectionSubtypeModel> inspectionSubtypesUpdated}) async {
     Get.to(() => CustomLoading());
-    await _delay(milliseconds: 400);
+    await _delay(milliseconds: 200);
     try {
-      final result = await InspectionTypeService().createInspectionType(inspectionType: inspectionType);
-      print(result.id);
-      for (var subtypeCreated in inspectionSubtypesCreated) {
-        InspectionSubtypeModel newModel = subtypeCreated;
-        newModel.inspectionTypeId = result.id!;
-        await InspectionSubtypeService().createInspectionSubtype(inspectionSubtype: newModel);
-      }
-      for (var subtypeUpdated in inspectionSubtypesUpdated) {
-        InspectionSubtypeModel newModel = subtypeUpdated;
-        newModel.inspectionTypeId = result.id!;
-        await InspectionSubtypeService().updateInspectionSubtype(inspectionSubtype: newModel);
-      }
+      final result = await InspectionTypeService().createOrAlterInspectionType(inspectionType: inspectionType);
       Get.back();
+      await _delay(milliseconds: 100);
       Get.back();
       await _delay();
       CustomAlert().successSnack('Tipo de Inspeção cadastrado');
@@ -92,33 +79,6 @@ class InspectionController extends GetxController {
     } catch (e) {
       Get.back();
       CustomAlert().error(content: 'Falha ao cadastrar tipo de inspeção');
-
-    }
-  }
-
-  Future<void> updateInspectionType({required InspectionTypeModel inspectionType,required List<InspectionSubtypeModel> inspectionSubtypesCreated, required List<InspectionSubtypeModel> inspectionSubtypesUpdated}) async {
-    Get.to(() => CustomLoading());
-    await _delay(milliseconds: 400);
-
-    try {
-      final result = await InspectionTypeService().updateInspectionType(inspectionType: inspectionType);
-      for (var subtypeCreated in inspectionSubtypesCreated) {
-        InspectionSubtypeModel newModel = subtypeCreated;
-        newModel.inspectionTypeId = result.id!;
-        await InspectionSubtypeService().createInspectionSubtype(inspectionSubtype: newModel);
-      }
-      for (var subtypeUpdated in inspectionSubtypesUpdated) {
-        await InspectionSubtypeService().updateInspectionSubtype(inspectionSubtype: subtypeUpdated);
-      }
-      Get.back();
-      Get.back();
-      await _delay();
-      CustomAlert().successSnack('Tipo de Inspeção atualizado');
-      fetchInspectionTypes();
-    } catch (e) {
-      Get.back();
-      CustomAlert().error(content: 'Falha ao atualizar tipo de inspeção');
-
 
     }
   }

@@ -2,8 +2,9 @@ class InspectionItemModel {
   String? id;
   String name;
   String inspectionSubtypeID;
+  bool isEdited;
 
-  InspectionItemModel({this.id, required this.name, required this.inspectionSubtypeID});
+  InspectionItemModel({this.id, required this.name, required this.inspectionSubtypeID, this.isEdited = false});
 
   factory InspectionItemModel.fromJson(Map<String, dynamic> json) {
     return InspectionItemModel(
@@ -23,6 +24,7 @@ class InspectionItemModel {
 
   Map<String, dynamic> toJsonCreate() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
     data['name'] = name;
     data['inspectionSubtypeID'] = inspectionSubtypeID;
     return data;

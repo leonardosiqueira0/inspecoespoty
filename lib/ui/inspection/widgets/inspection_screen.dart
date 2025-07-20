@@ -29,94 +29,111 @@ class _InspectionScreenState extends State<InspectionScreen> {
         height: MediaQuery.of(context).size.height,
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
 
-        child: Obx(
-          () => Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: SearchBar(
-                  hintText: 'Pesquisar',
-                  controller: controller.searchController,
-                  onChanged: (value) {
-                    controller.filterInspections(value);
-                  },
-                  leading: const Icon(Icons.search),
-                ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: SearchBar(
+                hintText: 'Pesquisar',
+                controller: controller.searchController,
+                onChanged: (value) {
+                  controller.filterInspections(value);
+                },
+                leading: const Icon(Icons.search),
               ),
+            ),
+            Obx(
+              () {
+                if (controller.isLoading.value) {
+                  return const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                if (controller.inspectionTypesFiltered.isEmpty) {
+                  Expanded(
+                    child: Center(child: Text('Nenhum registro encontrado')),
+                  );
+              }
+               return Expanded(
+                child: Column(
+                  children: [
+                    if (controller.inspectionTypesFiltered.isEmpty)
+                      Expanded(
+                        child: Center(child: Text('Nenhum registro encontrado')),
+                      ),
 
-              if (controller.inspectionTypesFiltered.isEmpty)
-                Expanded(
-                  child: Center(child: Text('Nenhum registro encontrado')),
-                ),
+                    if (controller.inspectionTypesFiltered.isNotEmpty)
+                      Expanded(
+                        child: RefreshIndicator(
+                          onRefresh: () async {
+                            controller.fetchInspectionTypes();
+                          },
+                          child: ListView.builder(
+                            itemCount: controller.inspectionTypesFiltered.length,
+                            itemBuilder: (context, index) {
+                              final inspectionType =
+                                  controller.inspectionTypesFiltered[index];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                child: CustomCard(
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    title: Text(inspectionType.name),
+                                    subtitle: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Tipo de Inspeção',
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.end,
+                                          children: [
+                                            Icon(Icons.paste_rounded, size: 16),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              '${inspectionType.quantity} Subtipos cadastrados',
+                                              style: TextStyle(fontSize: 14),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
 
-              if (controller.inspectionTypesFiltered.isNotEmpty)
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () async {
-                      controller.fetchInspectionTypes();
-                    },
-                    child: ListView.builder(
-                      itemCount: controller.inspectionTypesFiltered.length,
-                      itemBuilder: (context, index) {
-                        final inspectionType =
-                            controller.inspectionTypesFiltered[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),
-                          child: CustomCard(
-                            child: ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              title: Text(inspectionType.name),
-                              subtitle: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Tipo de Inspeção',
                                   ),
-                                  Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.end,
-                                    children: [
-                                      Icon(Icons.paste_rounded, size: 16),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        '${inspectionType.quantity} Subtipos cadastrados',
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                  onTap: () async {
+                                    Get.to(() => CustomLoading());
+                                    await Future.delayed(Duration(milliseconds: 200));
+                                    InspectionTypeModel? inspectionTypeModel =
+                                        await controller.getInspectionType(
+                                          id: inspectionType.id!,
+                                        );
 
-                            ),
-                            onTap: () async {
-                              Get.to(() => CustomLoading());
-                              InspectionTypeModel? inspectionTypeModel =
-                                  await controller.getInspectionType(
-                                    id: inspectionType.id!,
-                                  );
-                              if (inspectionTypeModel != null) {
-                                await Future.delayed(
-                                  Duration(milliseconds: 600),
-                                );
-                                Get.back();
-                                Get.to(
-                                  () => InspectionRegister(
-                                    inspectionTypeModel: inspectionType,
-                                  ),
-                                );
-                              } else {
-                                Get.back();
-                              }
+                                    if (inspectionTypeModel != null) {
+                                      Get.back();
+                                      Get.to(
+                                        () => InspectionRegister(
+                                          inspectionTypeModel: inspectionTypeModel,
+                                        ),
+                                      );
+                                    } else {
+                                      Get.back();
+                                    }
+                                  },
+                                ),
+                              );
                             },
                           ),
-                        );
-                      },
-                    ),
-                  ),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
-          ),
+              );},
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(

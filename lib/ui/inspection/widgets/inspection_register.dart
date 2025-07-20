@@ -6,8 +6,6 @@ import 'package:inspecoespoty/data/models/inspection_subtype_model.dart';
 import 'package:inspecoespoty/data/models/inspection_type_model.dart';
 import 'package:inspecoespoty/data/models/location_model.dart';
 import 'package:inspecoespoty/data/models/person_model.dart';
-import 'package:inspecoespoty/data/services/inspection_item_service.dart';
-import 'package:inspecoespoty/data/services/inspection_subtype_service.dart';
 import 'package:inspecoespoty/data/services/inspection_type_service.dart';
 import 'package:inspecoespoty/data/services/location_service.dart';
 import 'package:inspecoespoty/ui/.core/widgets/custom_button.dart';
@@ -17,6 +15,7 @@ import 'package:inspecoespoty/ui/inspection/controller/inspection_controller.dar
 import 'package:inspecoespoty/ui/inspection/widgets/inspection_subtype_register.dart';
 import 'package:inspecoespoty/utils/config.dart';
 import 'package:inspecoespoty/utils/formatters.dart';
+import 'package:uuid/uuid.dart';
 
 class InspectionRegister extends StatefulWidget {
   InspectionRegister({super.key, this.inspectionTypeModel});
@@ -31,6 +30,7 @@ class InspectionRegister extends StatefulWidget {
       <InspectionSubtypeModel>[].obs;
   RxList<InspectionSubtypeModel> inspectionSubtypesUpdated =
       <InspectionSubtypeModel>[].obs;
+  String id = '';
 
   RxList<InspectionSubtypeModel> get list {
     final combinedList = <InspectionSubtypeModel>[];
@@ -39,7 +39,6 @@ class InspectionRegister extends StatefulWidget {
     combinedList.addAll(inspectionSubtypesUpdated);
     return combinedList.obs;
   }
-  RxBool loading = false.obs;
 }
 
 class _InspectionRegisterState extends State<InspectionRegister> {
@@ -48,22 +47,18 @@ class _InspectionRegisterState extends State<InspectionRegister> {
   TextEditingController nameController = TextEditingController();
   LocationModel? selectedLocation;
   RxList locations = [].obs;
+  RxBool loading = false.obs;
 
   @override
   void initState() {
     Future.delayed(Duration.zero, () async {
-      widget.loading.value = true;
       if (widget.inspectionTypeModel != null) {
+        loading.value = true;
         nameController.text = widget.inspectionTypeModel!.name;
-        await Future.delayed(Duration.zero, () async {
-          List<InspectionSubtypeModel>? subtypes = await controller
-              .getInspectionSubTypes(id: widget.inspectionTypeModel!.id!);
-          if (subtypes != null) {
-            widget.inspectionSubtypes.assignAll(subtypes);
-          }
-        });
+        widget.inspectionSubtypes.assignAll(widget.inspectionTypeModel!.subtypes);
+        loading.value = false;
       }
-      widget.loading.value = false;
+      widget.id = widget.inspectionTypeModel?.id ?? Uuid().v4();
     });
 
     super.initState();
@@ -137,7 +132,7 @@ class _InspectionRegisterState extends State<InspectionRegister> {
                           ),
                           onPressed: () async {
                             InspectionSubtypeModel? model = await Get.to(
-                              () => InspectionSubtypeRegister(),
+                              () => InspectionSubtypeRegister(inspectionTypeId: widget.id,),
                             );
                             setState(() {
                               if (model != null) {
@@ -145,7 +140,6 @@ class _InspectionRegisterState extends State<InspectionRegister> {
                                 model.quantity = (model.inspectionItens ?? []).length;
                                 widget.inspectionSubtypesCreated.add(newModel);
                               }
-                              print(widget.inspectionSubtypesCreated);
                             });
 
                           },
@@ -161,7 +155,7 @@ class _InspectionRegisterState extends State<InspectionRegister> {
                         ),
                       ),
                       Obx(() {
-                        if (widget.loading.value) {
+                        if (loading.value == true) {
                           return Expanded(
                             child: Container(
                               child: Center(child: CircularProgressIndicator()),
@@ -197,18 +191,10 @@ class _InspectionRegisterState extends State<InspectionRegister> {
                                   ),
                                   child: InkWell(
                                     onTap: () async {
-                                      if (tipo == 'Created') {
-                                        Get.to(() => CustomLoading());
-                                        await Future.delayed(Duration(milliseconds: 100));
-                                        InspectionSubtypeModel? subtypeModel = subtype;
-                                        List<InspectionItemModel> inspectionItens = await InspectionItemService().getInspectionsItens(id: subtypeModel.id!);
-                                        subtypeModel.inspectionItens = inspectionItens;
-                                        Get.back();
-                                      }
-                                      await Future.delayed(Duration(milliseconds: 100));
                                       InspectionSubtypeModel? newModel = await Get.to(
                                         () => InspectionSubtypeRegister(
                                           inspectionSubtypeModel: subtype,
+                                            inspectionTypeId: widget.id
                                         ),
                                       );
                                       ;
@@ -326,28 +312,17 @@ class _InspectionRegisterState extends State<InspectionRegister> {
                 content: 'Salvar',
                 onTap: () async {
                   if (formKey.currentState!.validate()) {
-                    if (widget.inspectionTypeModel == null) {
-                      InspectionTypeModel model = InspectionTypeModel(
-                        name: nameController.text,
-                        departmentId: configUserModel!.departmentID,
-                      );
-                      await controller.createInspectionType(
-                        inspectionType: model,
-                        inspectionSubtypesCreated: widget.inspectionSubtypesCreated,
-                        inspectionSubtypesUpdated: widget.inspectionSubtypesUpdated,
-                      );
-                    } else {
-                      InspectionTypeModel model = InspectionTypeModel(
-                        id: widget.inspectionTypeModel!.id,
-                        name: nameController.text,
-                        departmentId: configUserModel!.departmentID,
-                      );
-                      await controller.updateInspectionType(
-                        inspectionType: model,
-                        inspectionSubtypesCreated: widget.inspectionSubtypesCreated,
-                        inspectionSubtypesUpdated: widget.inspectionSubtypesUpdated,
-                      );
-                    }
+                    InspectionTypeModel model = InspectionTypeModel(
+                      id: widget.id,
+                      name: nameController.text,
+                      departmentId: configUserModel!.departmentID,
+                      subtypes: widget.list,
+                    );
+                    await controller.createInspectionType(
+                          inspectionType: model,
+                          inspectionSubtypesCreated: widget.inspectionSubtypesCreated,
+                          inspectionSubtypesUpdated: widget.inspectionSubtypesUpdated,
+                        );
                   }
                 },
               ),

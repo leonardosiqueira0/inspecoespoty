@@ -12,8 +12,11 @@ import 'package:inspecoespoty/utils/formatters.dart';
 import 'package:uuid/uuid.dart';
 
 class InspectionItemRegister extends StatefulWidget {
-  InspectionItemRegister({super.key, this.inspectionItemModel});
+  InspectionItemRegister({super.key, this.inspectionItemModel, required this.inspectionSubtypeID});
   InspectionItemModel? inspectionItemModel;
+  String inspectionSubtypeID;
+  String idController = '';
+
   @override
   State<InspectionItemRegister> createState() => _InspectionItemRegisterState();
 }
@@ -29,6 +32,7 @@ class _InspectionItemRegisterState extends State<InspectionItemRegister> {
     if (widget.inspectionItemModel != null) {
       nameController.text = widget.inspectionItemModel!.name;
     }
+    widget.idController = widget.inspectionItemModel?.id ?? Uuid().v4();
     setState(() {});
 
     super.initState();
@@ -75,17 +79,17 @@ class _InspectionItemRegisterState extends State<InspectionItemRegister> {
                   if (formKey.currentState!.validate()) {
                     if (widget.inspectionItemModel == null) {
                       InspectionItemModel model = InspectionItemModel(
-                        id: Uuid().v4(),
+                        id: widget.idController,
                         name: nameController.text,
-                        inspectionSubtypeID: '',
+                        inspectionSubtypeID: widget.inspectionSubtypeID
                       );
                       Get.back(result: model);
                       return;
                     } else {
                       InspectionItemModel model = InspectionItemModel(
-                        id: widget.inspectionItemModel!.id,
+                        id: widget.idController,
                         name: nameController.text,
-                        inspectionSubtypeID: '',
+                        inspectionSubtypeID: widget.inspectionSubtypeID
                       );
                       Get.back(result: model);
                       return;

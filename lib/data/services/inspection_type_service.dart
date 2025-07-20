@@ -37,11 +37,11 @@ class InspectionTypeService {
     }
   }
 
-  Future<InspectionTypeModel> createInspectionType({required InspectionTypeModel inspectionType}) async {
+  Future<InspectionTypeModel> createOrAlterInspectionType({required InspectionTypeModel inspectionType}) async {
     try {
       final response = await ApiService.dio.post(
         route,
-        data: inspectionType.toJsonCreate(),
+        data: inspectionType.toJsonCreateOrAlter(),
       );
       if (response.statusCode != 201 && response.statusCode != 200) {
         throw '${response.data}';
@@ -51,20 +51,4 @@ class InspectionTypeService {
       throw 'Erro ao criar tipo de inspeção: $e';
     }
   }
-
-  Future<InspectionTypeModel> updateInspectionType({required InspectionTypeModel inspectionType}) async {
-    try {
-      final response = await ApiService.dio.put(
-        route,
-        data: inspectionType.toJson(),
-      );
-      if (response.statusCode != 201 && response.statusCode != 200) {
-        throw '${response.data}';
-      }
-      return InspectionTypeModel.fromJson(response.data);
-    } catch (e) {
-      throw 'Erro ao atualizar tipo de inspeção: $e';
-    }
-  }
-  
 }

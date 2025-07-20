@@ -17,9 +17,16 @@ import 'package:inspecoespoty/utils/formatters.dart';
 import 'package:uuid/uuid.dart';
 
 class InspectionSubtypeRegister extends StatefulWidget {
-  InspectionSubtypeRegister({super.key, this.inspectionSubtypeModel});
+  InspectionSubtypeRegister({
+    super.key,
+    this.inspectionSubtypeModel,
+    required this.inspectionTypeId,
+  });
 
   InspectionSubtypeModel? inspectionSubtypeModel;
+  String inspectionTypeId;
+  String idController = '';
+
 
   @override
   State<InspectionSubtypeRegister> createState() =>
@@ -30,6 +37,7 @@ class InspectionSubtypeRegister extends StatefulWidget {
   RxList<InspectionItemModel> inspectionItemsUpdated =
       <InspectionItemModel>[].obs;
 
+
   RxList<InspectionItemModel> get list {
     final combinedList = <InspectionItemModel>[];
     combinedList.addAll(inspectionItems);
@@ -37,6 +45,7 @@ class InspectionSubtypeRegister extends StatefulWidget {
     combinedList.addAll(inspectionItemsUpdated);
     return combinedList.obs;
   }
+
   RxBool loading = false.obs;
 }
 
@@ -53,11 +62,13 @@ class _InspectionSubtypeRegisterState extends State<InspectionSubtypeRegister> {
       if (widget.inspectionSubtypeModel != null) {
         nameController.text = widget.inspectionSubtypeModel!.name;
         await Future.delayed(Duration.zero, () async {
+          print(widget.inspectionSubtypeModel?.inspectionItens);
           widget.inspectionItems.assignAll(
             widget.inspectionSubtypeModel!.inspectionItens ?? [],
           );
         });
       }
+      widget.idController = widget.inspectionSubtypeModel?.id ?? Uuid().v4();
       widget.loading.value = false;
     });
 
@@ -129,14 +140,14 @@ class _InspectionSubtypeRegisterState extends State<InspectionSubtypeRegister> {
                           ),
                           onPressed: () async {
                             InspectionItemModel? model = await Get.to(
-                                  () => InspectionItemRegister(),
+                              () => InspectionItemRegister(inspectionSubtypeID: widget.idController,),
                             );
                             setState(() {
                               if (model != null) {
+                                model.isEdited = true;
                                 widget.inspectionItemsCreated.add(model);
                               }
                             });
-
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
@@ -170,96 +181,123 @@ class _InspectionSubtypeRegisterState extends State<InspectionSubtypeRegister> {
 
                         return Expanded(
                           child: Container(
-                            child: Obx(() => ListView.builder(
-                              itemBuilder: (context, index) {
-                                InspectionItemModel itemModel = widget.list[index];
-                                String tipo = '';
-                                if (widget.inspectionItemsUpdated.contains(itemModel) || widget.inspectionItemsCreated.contains(itemModel)) {
-                                  tipo = 'Updated';
-                                } else if (widget.inspectionItems.contains(itemModel)) {
-                                  tipo = 'Created';
-                                }
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 4.0,
-                                  ),
-                                  child: InkWell(
-                                    onTap: () async {
+                            child: Obx(
+                              () => ListView.builder(
+                                itemBuilder: (context, index) {
+                                  InspectionItemModel itemModel =
+                                      widget.list[index];
+                                  String tipo = '';
+                                  if (widget.inspectionItemsUpdated.contains(
+                                            itemModel,
+                                          ) ||
+                                          widget.inspectionItemsCreated
+                                              .contains(itemModel) ||
+                                          itemModel.isEdited ??
+                                      false) {
+                                    tipo = 'Updated';
+                                  } else if (widget.inspectionItems.contains(
+                                    itemModel,
+                                  )) {
+                                    tipo = 'Created';
+                                  }
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 4.0,
+                                    ),
+                                    child: InkWell(
+                                      onTap: () async {
+                                        InspectionItemModel? newModel =
+                                            await Get.to(
+                                              () => InspectionItemRegister(
+                                                inspectionItemModel: itemModel,
+                                                inspectionSubtypeID: widget.idController,
+                                              ),
+                                            );
+                                        ;
+                                        if (newModel != null) {
+                                          itemModel.isEdited = true;
+                                          // Remove o item da lista de atualizados se ele existir lá
+                                          // para evitar duplicidade ao atualizar um recém-atualizado
+                                          if (widget.inspectionItemsUpdated
+                                              .contains(itemModel)) {
+                                            widget.inspectionItemsUpdated
+                                                .remove(itemModel);
+                                          }
 
-                                      InspectionItemModel? newModel = await Get.to(
-                                            () => InspectionItemRegister(
-                                          inspectionItemModel: itemModel,
+                                          widget.inspectionItemsUpdated.add(
+                                            newModel,
+                                          );
+                                          // Remove o item da lista original se ele existir lá
+                                          if (widget.inspectionItems.contains(
+                                            itemModel,
+                                          )) {
+                                            widget.inspectionItems.remove(
+                                              itemModel,
+                                            );
+                                          }
+                                          // Remove o item da lista de criados se ele existir lá
+                                          // para evitar duplicidade ao atualizar um recém-criado
+                                          if (widget.inspectionItemsCreated
+                                              .contains(itemModel)) {
+                                            widget.inspectionItemsCreated
+                                                .remove(itemModel);
+                                          }
+                                        }
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.grey.shade300,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            4.0,
+                                          ),
+                                          color: (tipo == 'Updated')
+                                              ? Colors.yellow.shade100
+                                              : null,
                                         ),
-                                      );
-                                      ;
-                                      if (newModel != null) {
-                                        // Remove o item da lista de atualizados se ele existir lá
-                                        // para evitar duplicidade ao atualizar um recém-atualizado
-                                        if (widget.inspectionItemsUpdated.contains(itemModel)) {
-                                          widget.inspectionItemsUpdated.remove(itemModel);
-                                        }
-
-                                        widget.inspectionItemsUpdated.add(newModel);
-                                        // Remove o item da lista original se ele existir lá
-                                        if (widget.inspectionItems.contains(itemModel)) {
-                                          widget.inspectionItems.remove(itemModel);
-                                        }
-                                        // Remove o item da lista de criados se ele existir lá
-                                        // para evitar duplicidade ao atualizar um recém-criado
-                                        if (widget.inspectionItemsCreated.contains(itemModel)) {
-                                          widget.inspectionItemsCreated.remove(itemModel);
-                                        }
-                                      }
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey.shade300,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
                                         ),
-                                        borderRadius: BorderRadius.circular(4.0),
-                                        color: (tipo == 'Updated')
-                                            ? Colors.yellow.shade100
-                                            : null,
-                                      ),
-                                      padding: EdgeInsets.symmetric(horizontal: 8),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(height: 8),
-                                          Container(
-                                            width: 40,
-                                            height: 4,
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.primaryContainer,
-                                              borderRadius: BorderRadius.circular(
-                                                2.0,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: 8),
+                                            Container(
+                                              width: 40,
+                                              height: 4,
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.primaryContainer,
+                                                borderRadius:
+                                                    BorderRadius.circular(2.0),
                                               ),
                                             ),
-                                          ),
-                                          ListTile(
-                                            title: Text(itemModel.name),
-                                            subtitle: Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text('Subtipo de Inspeção'),
-
-                                              ],
+                                            ListTile(
+                                              title: Text(itemModel.name),
+                                              subtitle: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text('Item cadastrado'),
+                                                ],
+                                              ),
+                                              contentPadding: EdgeInsets.zero,
                                             ),
-                                            contentPadding: EdgeInsets.zero,
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                              itemCount: widget.list.length,
-                            )),
+                                  );
+                                },
+                                itemCount: widget.list.length,
+                              ),
+                            ),
                           ),
                         );
                       }),
@@ -268,23 +306,45 @@ class _InspectionSubtypeRegisterState extends State<InspectionSubtypeRegister> {
                   ),
                 ),
               ),
+              Container(
+                height: 50,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                          color: Colors.yellow.shade100,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(width: 1.5, color: Colors.black87)
+                      ),
+                    ),
+                    VerticalDivider(width: 4, color: Colors.transparent,),
+                    Text('Item criado ou atualizado')
+                  ],
+                ),
+              ),
               CustomButton(
                 content: 'Salvar',
                 onTap: () async {
                   if (formKey.currentState!.validate()) {
                     if (widget.inspectionSubtypeModel == null) {
                       InspectionSubtypeModel model = InspectionSubtypeModel(
-                        id: Uuid().v4(),
+                        id: widget.idController,
                         name: nameController.text,
-                        inspectionTypeId: '',
+                        inspectionTypeId: widget.inspectionTypeId,
+                        quantity: widget.list.length,
+                        inspectionItens: widget.list,
                       );
                       Get.back(result: model);
                       return;
                     } else {
                       InspectionSubtypeModel model = InspectionSubtypeModel(
-                        id: widget.inspectionSubtypeModel!.id,
+                        id: widget.idController,
                         name: nameController.text,
-                        inspectionTypeId: '',
+                        inspectionTypeId: widget.inspectionTypeId,
+                        quantity: widget.list.length,
+                        inspectionItens: widget.list,
                       );
                       Get.back(result: model);
                       return;
