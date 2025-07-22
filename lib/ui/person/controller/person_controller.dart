@@ -61,11 +61,7 @@ class PersonController extends GetxController {
       await PersonService().createPerson(person: person);
       fetchPersons();
       Get.back();
-      Get.snackbar('Sucesso', 'Pessoa cadastrada com sucesso', 
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-        backgroundColor: Colors.green.shade400,
-      );
+      CustomAlert().successSnack('Pessoa cadastrada com sucesso');
     } catch (e) {
       CustomAlert().error(title: 'Erro', content: '$e');
     }
@@ -76,11 +72,7 @@ class PersonController extends GetxController {
       await PersonService().updatePerson(person: person);
       fetchPersons();
       Get.back();
-      Get.snackbar('Sucesso', 'Pessoa atualizada com sucesso', 
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-        backgroundColor: Colors.green.shade400,
-      );
+      CustomAlert().successSnack('Pessoa atualizada com sucesso');
     } catch (e) {
       CustomAlert().error(title: 'Erro', content: '$e');
     }

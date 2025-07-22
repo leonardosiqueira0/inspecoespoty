@@ -63,11 +63,6 @@ class _InspectionItemRegisterState extends State<InspectionItemRegister> {
                         controller: nameController,
                         decoration: InputDecoration(labelText: 'Nome'),
                         keyboardType: TextInputType.name,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[a-zA-Z\s]'),
-                          ),
-                        ],
                       ),
                                           ],
                   ),
@@ -97,6 +92,8 @@ class _InspectionItemRegisterState extends State<InspectionItemRegister> {
                   }
                 },
               ),
+              SizedBox(height: 10),
+
             ],
           ),
         ),

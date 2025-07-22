@@ -1,3 +1,4 @@
+import 'package:inspecoespoty/data/models/inspection_checkitem_model.dart';
 import 'package:inspecoespoty/data/models/inspection_item_model.dart';
 import 'package:inspecoespoty/data/models/inspection_subtype_model.dart';
 import 'package:inspecoespoty/data/models/inspection_type_model.dart';
@@ -15,6 +16,7 @@ class InspectionModel {
   InspectionSubtypeModel inspectionSubtype;
   List<InspectionItemModel> inspectionItens;
   String status;
+  List<InspectionCheckitemModel>? checkItems;
 
   InspectionModel({
     required this.id,
@@ -27,6 +29,7 @@ class InspectionModel {
     required this.inspectionSubtype,
     required this.inspectionItens,
     required this.status,
+    this.checkItems,
   });
 
   factory InspectionModel.fromJson(Map<String, dynamic> json) {
@@ -50,6 +53,9 @@ class InspectionModel {
               .toList() ??
           [],
       status: json['status'],
+      checkItems: (json['inspectionItems'] as List<dynamic>?)
+          ?.map((item) => InspectionCheckitemModel.fromJson(item))
+          .toList(),
     );
   }
 
@@ -71,6 +77,7 @@ class InspectionModel {
     'inspector': inspector,
     'locationID': location.id,
     'managerID': manager.id,
+    if(supervisor != null) 'supervisorID': supervisor!.id,
     'date': "2025-07-20T15:00:00.000Z",
     'inspectionTypeID': inspectionType.id,
     'inspectionSubtypeID': inspectionSubtype.id,

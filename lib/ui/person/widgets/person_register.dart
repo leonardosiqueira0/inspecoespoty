@@ -148,6 +148,7 @@ class _PersonRegisterState extends State<PersonRegister> {
                   }
                 },
               ),
+              SizedBox(height: 10),
             ],
           ),
         ),

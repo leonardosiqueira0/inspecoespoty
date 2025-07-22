@@ -45,7 +45,6 @@ class InspectionService {
       final response = await ApiService.dio.get(
         '$route/$id',
       );
-      print('RESPONSE: ${response.data}');
       return InspectionModel.fromJson(response.data);
     } on DioException catch (e) {
       debugPrint('Erro ao carregar inspeção: $e');
@@ -69,6 +68,38 @@ class InspectionService {
     }
     catch (e) {
       throw Exception('Erro ao criar inspeção: $e');
+      return false;
+    }
+  }
+
+  Future<bool> cancelInspection({required InspectionModel model}) async {
+    try {
+      final response = await ApiService.dio.put(
+          '$route/cancel/${model.id}',
+      );
+      return true;
+    } on DioException catch (e) {
+      debugPrint('Erro ao cancelar inspeção: $e');
+      return false;
+    }
+    catch (e) {
+      debugPrint('Erro ao cancelar inspeção: $e');
+      return false;
+    }
+  }
+
+  Future<bool> finalizeInspection({required InspectionModel model}) async {
+    try {
+      final response = await ApiService.dio.put(
+        '$route/finalize/${model.id}',
+      );
+      return true;
+    } on DioException catch (e) {
+      debugPrint('Erro ao finalizar inspeção: $e');
+      return false;
+    }
+    catch (e) {
+      debugPrint('Erro ao finalizar inspeção: $e');
       return false;
     }
   }

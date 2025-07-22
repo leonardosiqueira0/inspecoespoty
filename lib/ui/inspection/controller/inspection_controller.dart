@@ -33,11 +33,7 @@ class InspectionController extends GetxController {
       }
     } catch (e) {
       debugPrint('Error fetching inspectionTypes: $e');
-      Get.snackbar('Erro', 'Erro ao buscar Tipos de Inspeção',
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-        backgroundColor: Colors.red.shade400,
-      );
+      CustomAlert().errorSnack('Erro ao buscar Tipos de Inspeção');
     } finally {
       isLoading.value = false;
 
@@ -48,7 +44,7 @@ class InspectionController extends GetxController {
     try {
       return await InspectionTypeService().getInspectionType(id: id);
     } catch (e) {
-      Get.snackbar('Erro', '$e');
+      CustomAlert().errorSnack('$e');
     }
     return null;
   }

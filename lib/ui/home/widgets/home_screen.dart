@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: CustomCard(
                                   color: (inspection.status == 'Pendente')
                                       ? Colors.yellow
-                                      : Colors.green,
+                                      : (inspection.status == 'Cancelado') ? Colors.red.shade200 : Colors.blueGrey.shade200,
                                   title: inspection.status,
                                   child: ListTile(
                                     contentPadding: EdgeInsets.zero,

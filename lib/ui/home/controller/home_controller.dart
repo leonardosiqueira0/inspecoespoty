@@ -31,11 +31,7 @@ class HomeController extends GetxController {
       inspection.assignAll(fetchedInspectionTypes);
     } catch (e) {
       debugPrint('Error fetching inspections: $e');
-      Get.snackbar('Erro', 'Erro ao buscar as Inspeções',
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-        backgroundColor: Colors.red.shade400,
-      );
+      CustomAlert().errorSnack('Erro ao buscar as Inspeções');
     } finally {
       isLoading.value = false;
     }
@@ -57,6 +53,26 @@ class HomeController extends GetxController {
     try {
       bool? inspectionModel = await InspectionService().createInspection(model: model);
       return inspectionModel;
+    } catch (e) {
+      debugPrint('Error fetching inspections: $e');
+      return false;
+    }
+  }
+
+  Future<bool> cancelInspection({required InspectionModel model}) async {
+    try {
+      bool? result = await InspectionService().cancelInspection(model: model);
+      return result;
+    } catch (e) {
+      debugPrint('Error fetching inspections: $e');
+      return false;
+    }
+  }
+
+  Future<bool> finalizeInspection({required InspectionModel model}) async {
+    try {
+      bool? result = await InspectionService().finalizeInspection(model: model);
+      return result;
     } catch (e) {
       debugPrint('Error fetching inspections: $e');
       return false;

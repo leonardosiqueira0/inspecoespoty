@@ -107,11 +107,6 @@ class _InspectionSubtypeRegisterState extends State<InspectionSubtypeRegister> {
                         controller: nameController,
                         decoration: InputDecoration(labelText: 'Nome'),
                         keyboardType: TextInputType.name,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[a-zA-Z\s]'),
-                          ),
-                        ],
                       ),
                       SizedBox(height: 16),
                       ListTile(

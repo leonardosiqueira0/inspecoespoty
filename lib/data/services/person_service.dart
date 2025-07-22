@@ -51,7 +51,7 @@ class PersonService {
 
   Future<void> updatePerson({required PersonModel person}) async {
     try {
-      final response = await ApiService.dio.post(
+      final response = await ApiService.dio.put(
         '/person',
         data: person.toJson(),
       );
