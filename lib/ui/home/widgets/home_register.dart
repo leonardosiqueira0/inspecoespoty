@@ -76,7 +76,6 @@ class _HomeRegisterState extends State<HomeRegister> {
         widget.selectedSubtype = widget.inspectionModel!.inspectionSubtype;
         widget.subtypeController.text =
             widget.inspectionModel!.inspectionSubtype.name;
-        print(widget.inspectionModel!.toJson());
         widget.statusController.text = widget.inspectionModel!.status;
 
         InspectionTypeModel type = await InspectionTypeService()
@@ -160,27 +159,27 @@ class _HomeRegisterState extends State<HomeRegister> {
 
                       SizedBox(height: 16),
                       DropdownMenu(
-                          width: MediaQuery.of(context).size.width,
-                          initialSelection: widget.inspectorController.text,
-                          controller: widget.inspectorController,
-                          enabled: widget.inspectionModel == null,
-                          dropdownMenuEntries: [
-                            DropdownMenuEntry<String>(
-                              value: 'Fernando Regino',
-                              label: 'Fernando Regino',
-                            ),
-                            DropdownMenuEntry<String>(
-                              value: 'Jesse Freitas',
-                              label: 'Jesse Freitas',
-                            ),
-                          ],
-                          label: Text('Inspetor'),
-                          onSelected: (value) {
-                            if (value != null) {
-                              widget.inspectorController.text = value;
-                            }
-                          },
-                        ),
+                        width: MediaQuery.of(context).size.width,
+                        initialSelection: widget.inspectorController.text,
+                        controller: widget.inspectorController,
+                        enabled: widget.inspectionModel == null,
+                        dropdownMenuEntries: [
+                          DropdownMenuEntry<String>(
+                            value: 'Fernando Regino',
+                            label: 'Fernando Regino',
+                          ),
+                          DropdownMenuEntry<String>(
+                            value: 'Jesse Freitas',
+                            label: 'Jesse Freitas',
+                          ),
+                        ],
+                        label: Text('Inspetor'),
+                        onSelected: (value) {
+                          if (value != null) {
+                            widget.inspectorController.text = value;
+                          }
+                        },
+                      ),
 
                       SizedBox(height: 16),
 
@@ -550,12 +549,11 @@ class _HomeRegisterState extends State<HomeRegister> {
                       } else {
                         Get.back();
                         CustomAlert().errorSnack('Erro ao cadastrar inspeção');
-                        print('Json: ${inspectionModel.toJsonCreate()}');
                       }
                     }
                   },
                 ),
-
+              if (widget.inspectionModel != null)
                 CustomButton(
                   content: 'Ações',
                   onTap: () async {
@@ -598,77 +596,138 @@ class _HomeRegisterState extends State<HomeRegister> {
                                   ListTile(
                                     title: Text('Checklist'),
                                     leading: Icon(Icons.checklist),
-                                    onTap: () {
-                                      Get.to(() => ChecklistScreen(checklist: widget.inspectionModel!.checkItems ?? []));
+                                    onTap: () async {
+                                      Get.back();
+                                      Get.to(
+                                        () => ChecklistScreen(
+                                          checklist:
+                                              widget
+                                                  .inspectionModel!
+                                                  .checkItems ??
+                                              [],
+                                        ),
+                                      );
                                     },
                                   ),
                                   ListTile(
                                     title: Text('Cancelar inspeção'),
                                     leading: Icon(Icons.cancel),
                                     onTap: () {
-                                      if (widget.inspectionModel!.status != 'Pendente') {
-                                        CustomAlert().error(content: 'Esta inspeção já foi finalizada', title: 'Atenção');
+                                      if (widget.inspectionModel!.status !=
+                                          'Pendente') {
+                                        CustomAlert().error(
+                                          content:
+                                              'Esta inspeção já foi finalizada',
+                                          title: 'Atenção',
+                                        );
                                         return;
                                       }
-                                      CustomAlert().confirm(content: 'Tem certeza que deseja cancelar esta inspeção?', onConfirm: () async {
-                                        final result = await widget.controller.cancelInspection(model: widget.inspectionModel!);
-                                        if (result) {
-                                          Get.back();
-                                          await Future.delayed(Duration(milliseconds: 100));
-                                          Get.back();
-                                          await Future.delayed(Duration(milliseconds: 100));
-                                          Get.back();
-                                          CustomAlert().successSnack('Inspeção cancelada');
-                                          widget.controller.fetchInspection();
-                                        } else {
-                                          Get.back();
-                                          CustomAlert().errorSnack('Erro ao cancelar inspeção');
-                                        }
-                                      });
+                                      CustomAlert().confirm(
+                                        content:
+                                            'Tem certeza que deseja cancelar esta inspeção?',
+                                        onConfirm: () async {
+                                          final result = await widget.controller
+                                              .cancelInspection(
+                                                model: widget.inspectionModel!,
+                                              );
+                                          if (result) {
+                                            Get.back();
+                                            await Future.delayed(
+                                              Duration(milliseconds: 100),
+                                            );
+                                            Get.back();
+                                            await Future.delayed(
+                                              Duration(milliseconds: 100),
+                                            );
+                                            Get.back();
+                                            CustomAlert().successSnack(
+                                              'Inspeção cancelada',
+                                            );
+                                            widget.controller.fetchInspection();
+                                          } else {
+                                            Get.back();
+                                            CustomAlert().errorSnack(
+                                              'Erro ao cancelar inspeção',
+                                            );
+                                          }
+                                        },
+                                      );
                                     },
                                   ),
                                   ListTile(
                                     title: Text('Finalizar inspeção'),
                                     leading: Icon(Icons.receipt_long),
                                     onTap: () {
-                                      if (widget.inspectionModel!.status != 'Pendente') {
-                                        CustomAlert().error(content: 'Esta inspeção já foi finalizada', title: 'Atenção');
+                                      if (widget.inspectionModel!.status !=
+                                          'Pendente') {
+                                        CustomAlert().error(
+                                          content:
+                                              'Esta inspeção já foi finalizada',
+                                          title: 'Atenção',
+                                        );
                                         return;
                                       }
-                                      CustomAlert().confirm(content: 'Tem certeza que deseja finalizar esta inspeção?', onConfirm: () async {
-                                        final result = await widget.controller.finalizeInspection(model: widget.inspectionModel!);
-                                        if (result) {
-                                          Get.back();
-                                          await Future.delayed(Duration(milliseconds: 100));
-                                          Get.back();
-                                          await Future.delayed(Duration(milliseconds: 100));
+                                      CustomAlert().confirm(
+                                        content:
+                                            'Tem certeza que deseja finalizar esta inspeção?',
+                                        onConfirm: () async {
+                                          final result = await widget.controller
+                                              .finalizeInspection(
+                                                model: widget.inspectionModel!,
+                                              );
+                                          if (result) {
+                                            Get.back();
+                                            await Future.delayed(
+                                              Duration(milliseconds: 100),
+                                            );
+                                            Get.back();
+                                            await Future.delayed(
+                                              Duration(milliseconds: 100),
+                                            );
 
-                                          Get.back();
-                                          CustomAlert().successSnack('Inspeção cancelada');
-                                          widget.controller.fetchInspection();
-                                        } else {
-                                          Get.back();
-                                          CustomAlert().errorSnack('Erro ao cancelar inspeção');
-                                        }
-                                      });
+                                            Get.back();
+                                            CustomAlert().successSnack(
+                                              'Inspeção cancelada',
+                                            );
+                                            widget.controller.fetchInspection();
+                                          } else {
+                                            Get.back();
+                                            CustomAlert().errorSnack(
+                                              'Erro ao cancelar inspeção',
+                                            );
+                                          }
+                                        },
+                                      );
                                     },
                                   ),
                                   ListTile(
                                     title: Text('Enviar relatório'),
                                     leading: Icon(Icons.send),
                                     onTap: () {
-                                      CustomAlert().confirm(content: 'Tem certeza que deseja enviar o relatório?', onConfirm: () async {
-                                        if (true) {
-                                          Get.back();
-                                          await Future.delayed(Duration(milliseconds: 100));
-                                          Get.back();
-                                          await Future.delayed(Duration(milliseconds: 100));
-                                          CustomAlert().successSnack('Relatório enviado');
-                                        } else {
-                                          Get.back();
-                                          CustomAlert().errorSnack('Erro ao enviar o relatório inspeção');
-                                        }
-                                      });
+                                      CustomAlert().confirm(
+                                        content:
+                                            'Tem certeza que deseja enviar o relatório?',
+                                        onConfirm: () async {
+                                          if (true) {
+                                            Get.back();
+                                            await Future.delayed(
+                                              Duration(milliseconds: 100),
+                                            );
+                                            Get.back();
+                                            await Future.delayed(
+                                              Duration(milliseconds: 100),
+                                            );
+                                            CustomAlert().successSnack(
+                                              'Relatório enviado',
+                                            );
+                                          } else {
+                                            Get.back();
+                                            CustomAlert().errorSnack(
+                                              'Erro ao enviar o relatório inspeção',
+                                            );
+                                          }
+                                        },
+                                      );
                                     },
                                   ),
                                 ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:inspecoespoty/data/models/inspection_checkitem_model.dart';
 import 'package:inspecoespoty/data/models/inspection_item_model.dart';
 import 'package:inspecoespoty/data/models/inspection_model.dart';
 import 'package:inspecoespoty/data/models/inspection_subtype_model.dart';
@@ -76,6 +77,26 @@ class HomeController extends GetxController {
     } catch (e) {
       debugPrint('Error fetching inspections: $e');
       return false;
+    }
+  }
+
+  Future<bool> checkItem({required InspectionCheckitemModel model}) async {
+    try {
+      bool? result = await InspectionService().checkItem(model: model);
+      return result;
+    } catch (e) {
+      debugPrint('Error fetching inspections: $e');
+      return false;
+    }
+  }
+
+  Future<List<InspectionCheckitemModel>> getCheckitens({required String id}) async {
+    try {
+      List<InspectionCheckitemModel> result = await InspectionService().getCheckitems(id: id);
+      return result;
+    } catch (e) {
+      debugPrint('Error fetching inspections: $e');
+      return [];
     }
   }
 

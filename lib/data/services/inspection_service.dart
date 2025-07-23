@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:inspecoespoty/data/models/inspection_checkitem_model.dart';
 import 'package:inspecoespoty/data/models/inspection_item_model.dart';
 import 'package:inspecoespoty/data/models/inspection_model.dart';
 import 'package:inspecoespoty/data/models/inspection_subtype_model.dart';
@@ -40,6 +41,26 @@ class InspectionService {
       throw Exception('Erro ao carregar inspeções: $e');
     }
   }
+
+  Future<List<InspectionCheckitemModel>> getCheckitems({required String id}) async {
+    try {
+
+      final response = await ApiService.dio.get(
+        '$route/checkitem/$id',
+      );
+      return (response.data as List)
+          .map((item) => InspectionCheckitemModel.fromJson(item))
+          .toList();
+    } on DioException catch (e) {
+      debugPrint('Erro ao carregar os itens: $e');
+      return [];
+    }
+    
+    catch (e) {
+      throw Exception('Erro ao carregar os itens: $e');
+    }
+  }
+
   Future<InspectionModel?> getInspection({required String id}) async {
     try {
       final response = await ApiService.dio.get(
@@ -100,6 +121,23 @@ class InspectionService {
     }
     catch (e) {
       debugPrint('Erro ao finalizar inspeção: $e');
+      return false;
+    }
+  }
+  
+  Future<bool> checkItem({required InspectionCheckitemModel model}) async {
+    try {
+      await ApiService.dio.put(
+        '$route/checkitem',
+        data: model.toJson(),
+      );
+      return true;
+    } on DioException catch (e) {
+      debugPrint('Erro ao realizar a checagem do item: $e');
+      return false;
+    }
+    catch (e) {
+      debugPrint('Erro ao realizar a checagem do item: $e');
       return false;
     }
   }
