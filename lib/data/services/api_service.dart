@@ -28,6 +28,7 @@ class ApiService {
               error.type == DioExceptionType.connectionError) {
             Get.offAll(NoInternetScreen());
           }
+          print('Error: ${error.message}');
           return handler.next(error);
         },
       ),
@@ -38,7 +39,11 @@ class ApiService {
 
 Future<bool> checkTokenApi() async {
   bool? verificacao = await LoginService().checkToken();
-  if (!verificacao!) {
+  if (verificacao == null) {
+    Get.offAll(NoInternetScreen());
+    return false;
+  }
+  if (!verificacao) {
     String? refreshToken = await Prefs.getString('refreshToken');
     if (refreshToken != null && refreshToken.isNotEmpty) {
       try {

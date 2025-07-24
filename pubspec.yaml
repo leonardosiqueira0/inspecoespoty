@@ -47,17 +47,17 @@ dependencies:
 
 flutter_native_splash:
   color: "#FFFFFF"
-  image: "images/logo.png"
+  image: "images/logo_reduzida.png"
   android: true
   ios: true
 
 flutter_icons:
-  image_path: "images/logo.png"
+  image_path: "images/logo_reduzida.png"
   ios: true
   remove_alpha_ios: true
   android: "launcher_icon"
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "images/logo.png"
+  adaptive_icon_foreground: "images/logo_reduzida.png"
 
 #flutter pub run flutter_native_splash:create
 #flutter pub run flutter_launcher_icons:main

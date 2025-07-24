@@ -1,5 +1,4 @@
 import 'package:inspecoespoty/data/models/location_model.dart';
-import 'package:inspecoespoty/data/models/person_model.dart';
 import 'package:inspecoespoty/data/services/api_service.dart';
 
 class LocationService {
@@ -16,7 +15,7 @@ class LocationService {
           .map((item) => LocationModel.fromJson(item))
           .toList();
     } catch (e) {
-      throw Exception('Erro ao carregar pessoas: $e');
+      throw Exception('Erro ao carregar as Localizações: $e');
     }
   }
 

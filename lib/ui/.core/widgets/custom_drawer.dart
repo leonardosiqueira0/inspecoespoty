@@ -30,7 +30,7 @@ class CustomDrawer extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                   currentAccountPicture: CircleAvatar(
-                    child: Icon(Icons.person),
+                    backgroundImage: AssetImage("images/logo_solo.png"),
                   ),
                 ),
                 ListTile(

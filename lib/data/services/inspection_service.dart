@@ -44,10 +44,10 @@ class InspectionService {
 
   Future<List<InspectionCheckitemModel>> getCheckitems({required String id}) async {
     try {
-
       final response = await ApiService.dio.get(
-        '$route/checkitem/$id',
+        '$route/checkitem/${id.toUpperCase()}',
       );
+      // print('NAO FAZ SENTIDO ESSA BUCETA NAO FUNCIONA');
       return (response.data as List)
           .map((item) => InspectionCheckitemModel.fromJson(item))
           .toList();

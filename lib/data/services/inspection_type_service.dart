@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:inspecoespoty/data/models/inspection_subtype_model.dart';
 import 'package:inspecoespoty/data/models/inspection_type_model.dart';
-import 'package:inspecoespoty/data/models/person_model.dart';
 import 'package:inspecoespoty/data/services/api_service.dart';
 import 'package:inspecoespoty/utils/config.dart';
 

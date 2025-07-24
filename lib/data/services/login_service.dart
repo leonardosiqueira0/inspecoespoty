@@ -135,5 +135,6 @@ class LoginService {
       debugPrint('Erro ao verificar token: $e');
       return false;
     }
+    return null;
   }
 }

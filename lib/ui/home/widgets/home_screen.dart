@@ -23,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  RxBool click = false.obs;
   _buildSubtitle(IconData icon, String text) {
     return Row(
       children: [
@@ -74,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onRefresh: () async {
                             controller.fetchInspection();
                           },
-                          child: ListView.builder(
+                          child: Obx(() => ListView.builder(
                             itemCount: controller.inspection.length,
                             itemBuilder: (context, index) {
                               final inspection = controller.inspection[index];
@@ -85,7 +86,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: CustomCard(
                                   color: (inspection.status == 'Pendente')
                                       ? Colors.yellow
-                                      : (inspection.status == 'Cancelado') ? Colors.red.shade200 : Colors.blueGrey.shade200,
+                                      : (inspection.status == 'Cancelado')
+                                      ? Colors.red.shade200
+                                      : Colors.blueGrey.shade200,
                                   title: inspection.status,
                                   child: ListTile(
                                     contentPadding: EdgeInsets.zero,
@@ -108,36 +111,42 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         _buildSubtitle(
                                           Icons.date_range,
-                                          formatDate(inspection.date)
+                                          formatDate(inspection.date),
                                         ),
                                       ],
                                     ),
                                   ),
                                   onTap: () async {
-                                    Get.to(() => CustomLoading());
-                                    await Future.delayed(Duration(milliseconds: 200));
-                                    InspectionModel? inspectionModel =
-                                    await controller.getInspection(
-                                      id: inspection.id,
-                                    );
+                                    if (click.value == false) {
+                                    click.value = true;
 
-
-                                    if (inspectionModel != null) {
-                                      Get.back();
-                                      Get.to(
-                                            () => HomeRegister(
-                                          inspectionModel: inspectionModel,
-                                        ),
+                                      Get.to(() => CustomLoading());
+                                      await Future.delayed(
+                                        Duration(milliseconds: 200),
                                       );
-                                    } else {
-                                      Get.back();
+                                      InspectionModel? inspectionModel =
+                                          await controller.getInspection(
+                                            id: inspection.id,
+                                          );
+
+                                      if (inspectionModel != null) {
+                                        Get.back();
+                                        await Get.to(
+                                          () => HomeRegister(
+                                            inspectionModel: inspectionModel,
+                                          ),
+                                        );
+                                      } else {
+                                        Get.back();
+                                      }
+                                      click.value = false;
                                     }
                                   },
                                 ),
                               );
                             },
                           ),
-                        ),
+                        )),
                       ),
                   ],
                 ),

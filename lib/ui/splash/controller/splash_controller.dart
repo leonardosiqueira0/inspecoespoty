@@ -11,7 +11,7 @@ class SplashController extends GetxController {
   @override
   void onInit() async {
     bool? validacao = await checkTokenApi();
-    if (validacao!) {
+    if (validacao) {
       configUserModel = UserModel.fromJson(jsonDecode(await Prefs.getString('userJson') ?? '{}'));
       Get.offAll(() => HomeScreen());
     }

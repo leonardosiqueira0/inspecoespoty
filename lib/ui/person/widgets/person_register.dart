@@ -67,11 +67,7 @@ class _PersonRegisterState extends State<PersonRegister> {
                         controller: nameController,
                         decoration: InputDecoration(labelText: 'Nome'),
                         keyboardType: TextInputType.name,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[a-zA-Z\s]'),
-                          ),
-                        ],
+                        
                       ),
                       SizedBox(height: 16),
                       TextFormField(

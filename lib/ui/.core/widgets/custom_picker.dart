@@ -11,6 +11,10 @@ Future<File?> CustomPicker(BuildContext context, {String? id}) async {
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text('Selecione uma opção', textScaler: TextScaler.linear(0.8),),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4.0),
+        ),
+        backgroundColor: Colors.white,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

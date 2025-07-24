@@ -126,18 +126,18 @@ class _HomeRegisterState extends State<HomeRegister> {
               : 'Cadastrar inspeção',
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height:
-              MediaQuery.of(context).size.height -
-              kToolbarHeight -
-              MediaQuery.of(context).padding.top -
-              MediaQuery.of(context).padding.bottom,
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Column(
-            children: [
-              Expanded(
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height:
+            MediaQuery.of(context).size.height -
+            kToolbarHeight -
+            MediaQuery.of(context).padding.top -
+            MediaQuery.of(context).padding.bottom,
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
                 child: Form(
                   key: widget.formKey,
                   child: Column(
@@ -156,7 +156,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                             ),
                           ],
                         ),
-
+                
                       SizedBox(height: 16),
                       DropdownMenu(
                         width: MediaQuery.of(context).size.width,
@@ -180,9 +180,9 @@ class _HomeRegisterState extends State<HomeRegister> {
                           }
                         },
                       ),
-
+                
                       SizedBox(height: 16),
-
+                
                       Obx(
                         () => DropdownMenu(
                           width: MediaQuery.of(context).size.width,
@@ -206,7 +206,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                         ),
                       ),
                       SizedBox(height: 16),
-
+                
                       Obx(
                         () => DropdownMenu(
                           width: MediaQuery.of(context).size.width,
@@ -229,7 +229,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                           },
                         ),
                       ),
-
+                
                       SizedBox(height: 16),
                       Obx(
                         () => DropdownMenu(
@@ -237,7 +237,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                           initialSelection: widget.selectedSupervisor,
                           controller: widget.supervisorController,
                           enabled: widget.inspectionModel == null,
-
+                
                           dropdownMenuEntries: widget.supervisors
                               .map(
                                 (supervisor) => DropdownMenuEntry<PersonModel>(
@@ -254,7 +254,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                           },
                         ),
                       ),
-
+                
                       SizedBox(height: 16),
                       Obx(
                         () => DropdownMenu(
@@ -262,7 +262,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                           initialSelection: widget.selectedType,
                           controller: widget.typeController,
                           enabled: widget.inspectionModel == null,
-
+                
                           dropdownMenuEntries: widget.inspectionTypes
                               .map(
                                 (types) =>
@@ -279,7 +279,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                               widget.subtypeController.clear();
                               widget.items.clear();
                               widget.itemsList.clear();
-
+                
                               InspectionTypeModel type =
                                   await InspectionTypeService()
                                       .getInspectionType(id: value.id!);
@@ -291,7 +291,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                           },
                         ),
                       ),
-
+                
                       SizedBox(height: 16),
                       Obx(
                         () => DropdownMenu(
@@ -320,7 +320,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                           },
                         ),
                       ),
-
+                
                       SizedBox(height: 16),
                       Obx(() {
                         return ListTile(
@@ -369,7 +369,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Container(
                                     width: MediaQuery.sizeOf(context).width,
-                                    height: MediaQuery.sizeOf(context).height,
+                                    height: MediaQuery.sizeOf(context).height / 2,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8.0),
                                       color: Colors.white,
@@ -420,6 +420,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                                                       return Obx(
                                                         () => InkWell(
                                                           onTap: () {
+                                                            if (widget.inspectionModel == null) {
                                                             setState(() {
                                                               if (addItems
                                                                   .contains(
@@ -433,7 +434,7 @@ class _HomeRegisterState extends State<HomeRegister> {
                                                                   item,
                                                                 );
                                                               }
-                                                            });
+                                                            });}
                                                           },
                                                           child: ListTile(
                                                             title: Text(
@@ -459,6 +460,15 @@ class _HomeRegisterState extends State<HomeRegister> {
                                               }),
                                             ),
                                           ),
+                                          if (widget.inspectionModel != null)
+                                            Text(
+                                              'Você não pode alterar os itens de uma inspeção já cadastrada',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 12,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
                                           if (widget.inspectionModel == null)
                                             Padding(
                                               padding: const EdgeInsets.all(
@@ -501,247 +511,279 @@ class _HomeRegisterState extends State<HomeRegister> {
                   ),
                 ),
               ),
-
-              if (widget.inspectionModel == null)
-                CustomButton(
-                  content: 'Salvar',
-                  onTap: () async {
-                    if (widget.inspectorController.text.isEmpty ||
-                        widget.selectedLocation == null ||
-                        widget.selectedManager == null ||
-                        widget.selectedType == null ||
-                        widget.selectedSubtype == null ||
-                        widget.items.isEmpty) {
-                      CustomAlert().error(content: 'Preencha todos os campos');
-                      return;
-                    }
-
-                    Get.to(() => CustomLoading());
-                    InspectionModel inspectionModel = InspectionModel(
-                      id: widget.id,
-                      inspector: widget.inspectorController.text,
-                      location: widget.selectedLocation!,
-                      manager: widget.selectedManager!,
-                      supervisor: widget.selectedSupervisor,
-                      date: widget.selectedDate ?? DateTime.now(),
-                      inspectionType: widget.selectedType!,
-                      inspectionSubtype: widget.selectedSubtype!,
-                      inspectionItens: widget.items,
-                      status: widget.inspectionModel == null
-                          ? 'Pendente'
-                          : widget.inspectionModel!.status,
+            ),
+              
+            if (widget.inspectionModel == null)
+              CustomButton(
+                content: 'Salvar',
+                onTap: () async {
+                  if (widget.inspectorController.text.isEmpty ||
+                      widget.selectedLocation == null ||
+                      widget.selectedManager == null ||
+                      widget.selectedType == null ||
+                      widget.selectedSubtype == null ||
+                      widget.items.isEmpty) {
+                    CustomAlert().error(content: 'Preencha todos os campos');
+                    return;
+                  }
+              
+                  Get.to(() => CustomLoading());
+                  InspectionModel inspectionModel = InspectionModel(
+                    id: widget.id,
+                    inspector: widget.inspectorController.text,
+                    location: widget.selectedLocation!,
+                    manager: widget.selectedManager!,
+                    supervisor: widget.selectedSupervisor,
+                    date: widget.selectedDate ?? DateTime.now(),
+                    inspectionType: widget.selectedType!,
+                    inspectionSubtype: widget.selectedSubtype!,
+                    inspectionItens: widget.items,
+                    status: widget.inspectionModel == null
+                        ? 'Pendente'
+                        : widget.inspectionModel!.status,
+                  );
+                  if (widget.inspectionModel == null) {
+                    bool? response = await widget.controller.createInspection(
+                      model: inspectionModel,
                     );
-                    if (widget.inspectionModel == null) {
-                      bool? response = await widget.controller.createInspection(
-                        model: inspectionModel,
+                    if (response != null) {
+                      Get.back();
+                      await Future.delayed(
+                        Duration(milliseconds: 100),
+                        () {},
                       );
-                      if (response != null) {
-                        Get.back();
-                        await Future.delayed(
-                          Duration(milliseconds: 100),
-                          () {},
-                        );
-                        Get.back();
-                        CustomAlert().successSnack(
-                          'Inspeção cadastrada com sucesso',
-                        );
-                        widget.controller.fetchInspection();
-                      } else {
-                        Get.back();
-                        CustomAlert().errorSnack('Erro ao cadastrar inspeção');
-                      }
+                      Get.back();
+                      CustomAlert().successSnack(
+                        'Inspeção cadastrada com sucesso',
+                      );
+                      widget.controller.fetchInspection();
+                    } else {
+                      Get.back();
+                      CustomAlert().errorSnack('Erro ao cadastrar inspeção');
                     }
-                  },
-                ),
-              if (widget.inspectionModel != null)
-                CustomButton(
-                  content: 'Ações',
-                  onTap: () async {
-                    Get.dialog(
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: MediaQuery.sizeOf(context).width * 0.7,
-                            height: MediaQuery.sizeOf(context).height * 0.5,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.0),
-                              color: Colors.white,
-                            ),
-                            child: Scaffold(
+                  }
+                },
+              ),
+            if (widget.inspectionModel != null)
+              CustomButton(
+                content: 'Ações',
+                onTap: () async {
+                  Get.dialog(
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: MediaQuery.sizeOf(context).width * 0.7,
+                          height: MediaQuery.sizeOf(context).height * 0.5,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            color: Colors.white,
+                          ),
+                          child: Scaffold(
+                            backgroundColor: Colors.transparent,
+                            appBar: AppBar(
+                              automaticallyImplyLeading: false,
                               backgroundColor: Colors.transparent,
-                              appBar: AppBar(
-                                automaticallyImplyLeading: false,
-                                backgroundColor: Colors.transparent,
-                                title: Text(
-                                  'Ações',
-                                  style: TextStyle(color: Colors.black87),
+                              title: Text(
+                                'Ações',
+                                style: TextStyle(color: Colors.black87),
+                              ),
+                              actions: [
+                                IconButton(
+                                  onPressed: () {
+                                    Get.back();
+                                  },
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: Colors.black87,
+                                  ),
                                 ),
-                                actions: [
-                                  IconButton(
-                                    onPressed: () {
-                                      Get.back();
-                                    },
-                                    icon: Icon(
-                                      Icons.close,
-                                      color: Colors.black87,
+                              ],
+                            ),
+                            body: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric( horizontal: 6.0, vertical: 6.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue.shade100,
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: ListTile(
+                                      title: Text('Checklist'),
+                                      leading: Icon(Icons.checklist),
+                                      onTap: () async {
+                                        Get.back();
+                                        Get.to(
+                                          () => ChecklistScreen(
+                                            inspection: widget.inspectionModel!,
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
-                                ],
-                              ),
-                              body: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  ListTile(
-                                    title: Text('Checklist'),
-                                    leading: Icon(Icons.checklist),
-                                    onTap: () async {
-                                      Get.back();
-                                      Get.to(
-                                        () => ChecklistScreen(
-                                          checklist:
-                                              widget
-                                                  .inspectionModel!
-                                                  .checkItems ??
-                                              [],
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    title: Text('Cancelar inspeção'),
-                                    leading: Icon(Icons.cancel),
-                                    onTap: () {
-                                      if (widget.inspectionModel!.status !=
-                                          'Pendente') {
-                                        CustomAlert().error(
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric( horizontal: 6.0, vertical: 6.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.shade100,
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: ListTile(
+                                      title: Text('Cancelar inspeção'),
+                                      leading: Icon(Icons.cancel),
+                                      onTap: () {
+                                        if (widget.inspectionModel!.status !=
+                                            'Pendente') {
+                                          CustomAlert().error(
+                                            content:
+                                                'Esta inspeção já foi finalizada',
+                                            title: 'Atenção',
+                                          );
+                                          return;
+                                        }
+                                        CustomAlert().confirm(
                                           content:
-                                              'Esta inspeção já foi finalizada',
-                                          title: 'Atenção',
-                                        );
-                                        return;
-                                      }
-                                      CustomAlert().confirm(
-                                        content:
-                                            'Tem certeza que deseja cancelar esta inspeção?',
-                                        onConfirm: () async {
-                                          final result = await widget.controller
-                                              .cancelInspection(
-                                                model: widget.inspectionModel!,
+                                              'Tem certeza que deseja cancelar esta inspeção?',
+                                          onConfirm: () async {
+                                            final result = await widget.controller
+                                                .cancelInspection(
+                                                  model: widget.inspectionModel!,
+                                                );
+                                            if (result) {
+                                              Get.back();
+                                              await Future.delayed(
+                                                Duration(milliseconds: 100),
                                               );
-                                          if (result) {
-                                            Get.back();
-                                            await Future.delayed(
-                                              Duration(milliseconds: 100),
-                                            );
-                                            Get.back();
-                                            await Future.delayed(
-                                              Duration(milliseconds: 100),
-                                            );
-                                            Get.back();
-                                            CustomAlert().successSnack(
-                                              'Inspeção cancelada',
-                                            );
-                                            widget.controller.fetchInspection();
-                                          } else {
-                                            Get.back();
-                                            CustomAlert().errorSnack(
-                                              'Erro ao cancelar inspeção',
-                                            );
-                                          }
-                                        },
-                                      );
-                                    },
+                                              Get.back();
+                                              await Future.delayed(
+                                                Duration(milliseconds: 100),
+                                              );
+                                              Get.back();
+                                              CustomAlert().successSnack(
+                                                'Inspeção cancelada',
+                                              );
+                                              widget.controller.fetchInspection();
+                                            } else {
+                                              Get.back();
+                                              CustomAlert().errorSnack(
+                                                'Erro ao cancelar inspeção',
+                                              );
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
                                   ),
-                                  ListTile(
-                                    title: Text('Finalizar inspeção'),
-                                    leading: Icon(Icons.receipt_long),
-                                    onTap: () {
-                                      if (widget.inspectionModel!.status !=
-                                          'Pendente') {
-                                        CustomAlert().error(
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric( horizontal: 6.0, vertical: 6.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.shade100,
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: ListTile(
+                                      title: Text('Finalizar inspeção'),
+                                      leading: Icon(Icons.receipt_long),
+                                      onTap: () {
+                                        if (widget.inspectionModel!.status !=
+                                            'Pendente') {
+                                          CustomAlert().error(
+                                            content:
+                                                'Esta inspeção já foi finalizada',
+                                            title: 'Atenção',
+                                          );
+                                          return;
+                                        }
+                                        CustomAlert().confirm(
                                           content:
-                                              'Esta inspeção já foi finalizada',
-                                          title: 'Atenção',
-                                        );
-                                        return;
-                                      }
-                                      CustomAlert().confirm(
-                                        content:
-                                            'Tem certeza que deseja finalizar esta inspeção?',
-                                        onConfirm: () async {
-                                          final result = await widget.controller
-                                              .finalizeInspection(
-                                                model: widget.inspectionModel!,
+                                              'Tem certeza que deseja finalizar esta inspeção?',
+                                          onConfirm: () async {
+                                            final result = await widget.controller
+                                                .finalizeInspection(
+                                                  model: widget.inspectionModel!,
+                                                );
+                                            if (result) {
+                                              Get.back();
+                                              await Future.delayed(
+                                                Duration(milliseconds: 100),
                                               );
-                                          if (result) {
-                                            Get.back();
-                                            await Future.delayed(
-                                              Duration(milliseconds: 100),
-                                            );
-                                            Get.back();
-                                            await Future.delayed(
-                                              Duration(milliseconds: 100),
-                                            );
-
-                                            Get.back();
-                                            CustomAlert().successSnack(
-                                              'Inspeção cancelada',
-                                            );
-                                            widget.controller.fetchInspection();
-                                          } else {
-                                            Get.back();
-                                            CustomAlert().errorSnack(
-                                              'Erro ao cancelar inspeção',
-                                            );
-                                          }
-                                        },
-                                      );
-                                    },
+                                              Get.back();
+                                              await Future.delayed(
+                                                Duration(milliseconds: 100),
+                                              );
+                                                  
+                                              Get.back();
+                                              CustomAlert().successSnack(
+                                                'Inspeção cancelada',
+                                              );
+                                              widget.controller.fetchInspection();
+                                            } else {
+                                              Get.back();
+                                              CustomAlert().errorSnack(
+                                                'Erro ao cancelar inspeção',
+                                              );
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
                                   ),
-                                  ListTile(
-                                    title: Text('Enviar relatório'),
-                                    leading: Icon(Icons.send),
-                                    onTap: () {
-                                      CustomAlert().confirm(
-                                        content:
-                                            'Tem certeza que deseja enviar o relatório?',
-                                        onConfirm: () async {
-                                          if (true) {
-                                            Get.back();
-                                            await Future.delayed(
-                                              Duration(milliseconds: 100),
-                                            );
-                                            Get.back();
-                                            await Future.delayed(
-                                              Duration(milliseconds: 100),
-                                            );
-                                            CustomAlert().successSnack(
-                                              'Relatório enviado',
-                                            );
-                                          } else {
-                                            Get.back();
-                                            CustomAlert().errorSnack(
-                                              'Erro ao enviar o relatório inspeção',
-                                            );
-                                          }
-                                        },
-                                      );
-                                    },
+                                ),
+                               Padding(
+                                  padding: const EdgeInsets.symmetric( horizontal: 6.0, vertical: 6.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.shade100,
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: ListTile(
+                                      title: Text('Enviar relatório'),
+                                      leading: Icon(Icons.send),
+                                      onTap: () {
+                                        CustomAlert().confirm(
+                                          content:
+                                              'Tem certeza que deseja enviar o relatório?',
+                                          onConfirm: () async {
+                                            if (true) {
+                                              Get.back();
+                                              await Future.delayed(
+                                                Duration(milliseconds: 100),
+                                              );
+                                              Get.back();
+                                              await Future.delayed(
+                                                Duration(milliseconds: 100),
+                                              );
+                                              CustomAlert().successSnack(
+                                                'Relatório enviado',
+                                              );
+                                            } else {
+                                              Get.back();
+                                              CustomAlert().errorSnack(
+                                                'Erro ao enviar o relatório inspeção',
+                                              );
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              SizedBox(height: 10),
-            ],
-          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            SizedBox(height: 10),
+          ],
         ),
       ),
     );

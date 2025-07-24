@@ -11,6 +11,7 @@ class CustomCard extends StatefulWidget {
   final String? title;
   final VoidCallback? onTap;
 
+
   const CustomCard({Key? key, required this.child, this.title, this.color, this.onTap})
     : super(key: key);
 
