@@ -9,3 +9,7 @@ Color get primaryColor => Color(0xFF5a9f44);
 formatDate(DateTime data) {
   return '${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year} ${data.hour.toString().padLeft(2, '0')}:${data.minute.toString().padLeft(2, '0')}';
 }
+
+formatDateMinimal(DateTime data) {
+  return '${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year}';
+}

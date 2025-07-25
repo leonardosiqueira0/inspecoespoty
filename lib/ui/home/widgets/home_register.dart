@@ -182,6 +182,32 @@ class _HomeRegisterState extends State<HomeRegister> {
                       ),
                 
                       SizedBox(height: 16),
+                      TextFormField(
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                labelText: 'Data',
+                                suffixIcon: Icon(Icons.calendar_today),
+                              ),
+                              controller: TextEditingController(
+                                text: widget.selectedDate != null
+                                    ? formatDateMinimal(widget.selectedDate!)
+                                    : '',
+                              ),
+                              onTap: () async {
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate:
+                                     widget.selectedDate ?? DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                );
+                                if (picked != null) {
+                                  setState(() => widget.selectedDate = picked);
+                                }
+                              },
+                            ),
+                      SizedBox(height: 16),
+
                 
                       Obx(
                         () => DropdownMenu(

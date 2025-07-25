@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inspecoespoty/ui/splash/widgets/splash_screen.dart';
 import 'package:inspecoespoty/utils/config.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +18,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Inspeções Poty',
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [Locale('pt', 'BR')],
+      locale: const Locale('pt', 'BR'),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: primaryColor,
@@ -33,9 +41,8 @@ class MyApp extends StatelessWidget {
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
-
-
         ),
+
         searchBarTheme: SearchBarThemeData(
           backgroundColor: WidgetStatePropertyAll(Colors.white),
           elevation: WidgetStatePropertyAll(0),

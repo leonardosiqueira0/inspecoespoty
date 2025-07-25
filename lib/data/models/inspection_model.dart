@@ -78,7 +78,7 @@ class InspectionModel {
     'locationID': location.id,
     'managerID': manager.id,
     if(supervisor != null) 'supervisorID': supervisor!.id,
-    'date': "2025-07-20T15:00:00.000Z",
+    'date': date.toIso8601String(),
     'inspectionTypeID': inspectionType.id,
     'inspectionSubtypeID': inspectionSubtype.id,
     'inspectionItems': inspectionItens.map((item) => item.toJson()).toList(),

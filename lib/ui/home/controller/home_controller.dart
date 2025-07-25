@@ -15,8 +15,16 @@ import 'package:inspecoespoty/ui/.core/widgets/custom_loading.dart';
 
 class HomeController extends GetxController {
   RxList<InspectionSimpleModel> inspection = <InspectionSimpleModel>[].obs;
+  RxList<InspectionSimpleModel> filteredInspections = <InspectionSimpleModel>[].obs;
+
   TextEditingController searchController = TextEditingController();
   RxBool isLoading = false.obs;
+
+  DateTime? startDate;
+  DateTime? endDate;
+  InspectionTypeModel? inspectionType;
+  String? location;
+  String? inspector;
 
   @override
   void onInit() {
@@ -25,11 +33,35 @@ class HomeController extends GetxController {
     // Initialize any data or state here
   }
 
+  void applyFilters() {
+    filteredInspections.value = inspection.where((ins) {
+      bool matches = true;
+      if (startDate != null) {
+        matches &= !ins.date.isBefore(startDate!);
+      }
+      if (endDate != null) {
+        matches &= !ins.date.isAfter(endDate!);
+      }
+      if (inspectionType != null) {
+        matches &= (ins.inspectionType.id == inspectionType!.id);
+      }
+      if (location != null && location!.isNotEmpty) {
+        matches &= (ins.location.name == location);
+      }
+      if (inspector != null && inspector!.isNotEmpty) {
+        matches &= (ins.inspector == inspector);
+      }
+      return matches;
+    }).toList();
+  }
+
   void fetchInspection() async {
     isLoading.value = true;
     try {
       List<InspectionSimpleModel> fetchedInspectionTypes = await InspectionService().getInspections();
+      fetchedInspectionTypes.sort((a, b) => b.date.compareTo(a.date));
       inspection.assignAll(fetchedInspectionTypes);
+      filteredInspections.assignAll(fetchedInspectionTypes);
     } catch (e) {
       debugPrint('Error fetching inspections: $e');
       CustomAlert().errorSnack('Erro ao buscar as Inspeções');
